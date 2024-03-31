@@ -6,6 +6,7 @@ require (
 	github.com/bigmate/set v0.0.0-20230112152854-8affd6f1954c
 	github.com/bigmate/slice v1.0.7
 	github.com/labstack/echo/v4 v4.11.4
+	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/sharpvik/fungi v1.2.0
 )
 
