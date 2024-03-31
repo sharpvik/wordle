@@ -1,0 +1,61 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.letter {
+  border: 2px solid grey;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 1.5rem;
+  width: 32px;
+  margin: 8px;
+  padding: 4px 0;
+  text-align: center;
+}
+.absent {
+  background-color: grey;
+  color: black;
+}
+.present {
+  background-color: white;
+  color: black;
+}
+.placed {
+  background-color: yellow;
+  color: black;
+  border: 2px solid darkorange;
+}
+
+.restart {
+  background-color: red;
+  border: 2px solid red;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 1.5rem;
+  margin: 8px;
+  padding: 4px 8px;
+  text-align: center;
+}
+.submit {
+  background-color: darkorange;
+  border: 2px solid darkorange;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 1.5rem;
+  margin: 8px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+li {
+  display: inline-block;
+  padding: 8px;
+  margin: 8px;
+  border: 1px solid grey;
+}
