@@ -7,8 +7,12 @@ import Html exposing (Html, button, div, input, li, span, text, ul)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onDoubleClick, onInput)
 import Http
-import Json.Decode exposing (Decoder, list, string)
-import Json.Encode as E
+import Letter exposing (Letter, Type(..))
+import Service
+
+
+
+-- MODEL & MSG
 
 
 type alias Model =
@@ -18,59 +22,17 @@ type alias Model =
     }
 
 
-type alias Letter =
-    { rune : Char, ty : Type }
-
-
-replaceRune : Char -> Letter -> Letter
-replaceRune char letter =
-    { letter | rune = char }
-
-
-altLetter : Letter -> Letter
-altLetter letter =
-    { letter | ty = nextType letter.ty }
-
-
-nextType : Type -> Type
-nextType ty =
-    case ty of
-        Absent ->
-            Present
-
-        Present ->
-            Placed
-
-        Placed ->
-            Absent
-
-
-type Type
-    = Absent
-    | Present
-    | Placed
-
-
-typeToString : Type -> String
-typeToString ty =
-    case ty of
-        Absent ->
-            "absent"
-
-        Present ->
-            "present"
-
-        Placed ->
-            "placed"
-
-
 type Msg
     = GotLetterInput Int String
     | GotLetterAlt Int
-    | GotPatchResponse (Result Http.Error (List String))
+    | GotPossibleWords (Result Http.Error (List String))
     | Submit
     | Restart
     | Restarted (Result Http.Error ())
+
+
+
+-- INIT
 
 
 init : () -> ( Model, Cmd Msg )
@@ -80,15 +42,14 @@ init _ =
 
 initModel : Model
 initModel =
-    { letters = rowOfLetters
+    { letters = Letter.row
     , words = []
     , history = []
     }
 
 
-rowOfLetters : Array Letter
-rowOfLetters =
-    Array.repeat 5 <| Letter 'з' Absent
+
+-- VIEW
 
 
 view : Model -> Browser.Document Msg
@@ -107,7 +68,7 @@ body model =
                 [ type_ "text"
                 , value <| String.fromChar letter.rune
                 , class <| "letter"
-                , class <| typeToString letter.ty
+                , class <| Letter.typeToString letter.ty
                 , onInput <| GotLetterInput index
                 , onDoubleClick <| GotLetterAlt index
                 ]
@@ -138,7 +99,7 @@ body model =
         historyBox letter =
             span
                 [ class <| "letter"
-                , class <| typeToString letter.ty
+                , class <| Letter.typeToString letter.ty
                 ]
                 [ text <| String.fromChar letter.rune ]
     in
@@ -152,6 +113,10 @@ body model =
 viewPossibleWords : Model -> List (Html Msg)
 viewPossibleWords { words } =
     List.map (\word -> li [] [ text word ]) words |> ul [] |> List.singleton
+
+
+
+-- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -168,24 +133,14 @@ update msg model =
         GotLetterAlt index ->
             ( updateAltLetter index model, Cmd.none )
 
-        GotPatchResponse resp ->
-            case resp of
-                Ok words ->
-                    ( { model
-                        | words = words
-                        , history = model.history ++ [ model.letters ]
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    ( { model | words = [ "FAILURE" ] }, Cmd.none )
+        GotPossibleWords response ->
+            ( updatePossibleWords response model, Cmd.none )
 
         Submit ->
-            ( model, getPossibleWords model )
+            ( model, Service.getPossibleWords model.letters GotPossibleWords )
 
         Restart ->
-            ( model, restartTheGame )
+            ( model, Service.restartTheGame Restarted )
 
         Restarted _ ->
             ( initModel, Cmd.none )
@@ -193,56 +148,29 @@ update msg model =
 
 updateLetter : Int -> Char -> Model -> Model
 updateLetter index char model =
-    { model | letters = Arr.update index (replaceRune char) model.letters }
+    { model | letters = Arr.update index (Letter.map char) model.letters }
 
 
 updateAltLetter : Int -> Model -> Model
 updateAltLetter index model =
-    { model | letters = Arr.update index altLetter model.letters }
+    { model | letters = Arr.update index Letter.alt model.letters }
 
 
-restartTheGame : Cmd Msg
-restartTheGame =
-    Http.request
-        { method = "DELETE"
-        , headers = []
-        , url = "/"
-        , body = Http.emptyBody
-        , expect = Http.expectWhatever Restarted
-        , timeout = Nothing
-        , tracker = Nothing
-        }
+updatePossibleWords : Result Http.Error (List String) -> Model -> Model
+updatePossibleWords response model =
+    case response of
+        Ok words ->
+            { model
+                | words = words
+                , history = model.history ++ [ model.letters ]
+            }
+
+        _ ->
+            { model | words = [ "FAILURE" ] }
 
 
-getPossibleWords : Model -> Cmd Msg
-getPossibleWords { letters } =
-    Http.request
-        { method = "PATCH"
-        , headers = []
-        , url = "/"
-        , body = Http.jsonBody <| lettersEncoder letters
-        , expect = Http.expectJson GotPatchResponse possibleWordsDecoder
-        , timeout = Nothing
-        , tracker = Nothing
-        }
 
-
-lettersEncoder : Array Letter -> E.Value
-lettersEncoder letters =
-    E.object [ ( "letters", E.array letterEncoder letters ) ]
-
-
-letterEncoder : Letter -> E.Value
-letterEncoder letter =
-    E.object
-        [ ( "type", E.string <| typeToString letter.ty )
-        , ( "rune", E.string <| String.fromChar letter.rune )
-        ]
-
-
-possibleWordsDecoder : Decoder (List String)
-possibleWordsDecoder =
-    list string
+-- MAIN
 
 
 main : Program () Model Msg

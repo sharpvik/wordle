@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.O.C === region.U.C)
+	if (region.O.B === region.U.B)
 	{
-		return 'on line ' + region.O.C;
+		return 'on line ' + region.O.B;
 	}
-	return 'on lines ' + region.O.C + ' through ' + region.U.C;
+	return 'on lines ' + region.O.B + ' through ' + region.U.B;
 }
 
 
@@ -2721,7 +2721,7 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 	return {
 		o: func(record.o),
 		P: record.P,
-		M: record.M
+		L: record.L
 	}
 });
 
@@ -2993,7 +2993,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.P;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.M) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -5369,10 +5369,10 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Main$Absent = 0;
-var $author$project$Main$Letter = F2(
+var $author$project$Letter$Absent = 0;
+var $author$project$Letter$Letter = F2(
 	function (rune, ty) {
-		return {D: rune, y: ty};
+		return {M: rune, I: ty};
 	});
 var $elm$core$Array$repeat = F2(
 	function (n, e) {
@@ -5383,11 +5383,11 @@ var $elm$core$Array$repeat = F2(
 				return e;
 			});
 	});
-var $author$project$Main$rowOfLetters = A2(
+var $author$project$Letter$row = A2(
 	$elm$core$Array$repeat,
 	5,
-	A2($author$project$Main$Letter, 'з', 0));
-var $author$project$Main$initModel = {B: _List_Nil, k: $author$project$Main$rowOfLetters, J: _List_Nil};
+	A2($author$project$Letter$Letter, 'з', 0));
+var $author$project$Main$initModel = {A: _List_Nil, k: $author$project$Letter$row, H: _List_Nil};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
@@ -5395,8 +5395,92 @@ var $author$project$Main$init = function (_v0) {
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$GotPatchResponse = function (a) {
+var $author$project$Main$GotPossibleWords = function (a) {
 	return {$: 2, a: a};
+};
+var $author$project$Main$Restarted = function (a) {
+	return {$: 5, a: a};
+};
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$foldl = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (!node.$) {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldl,
+			func,
+			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
+			tail);
+	});
+var $elm$json$Json$Encode$array = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$Array$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(0),
+				entries));
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(0),
+			pairs));
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Letter$typeToString = function (ty) {
+	switch (ty) {
+		case 0:
+			return 'absent';
+		case 1:
+			return 'present';
+		default:
+			return 'placed';
+	}
+};
+var $author$project$Letter$value = function (letter) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'type',
+				$elm$json$Json$Encode$string(
+					$author$project$Letter$typeToString(letter.I))),
+				_Utils_Tuple2(
+				'rune',
+				$elm$json$Json$Encode$string(
+					$elm$core$String$fromChar(letter.M)))
+			]));
+};
+var $author$project$Letter$array = function (letters) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'letters',
+				A2($elm$json$Json$Encode$array, $author$project$Letter$value, letters))
+			]));
 };
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
@@ -6018,90 +6102,9 @@ var $elm$http$Http$jsonBody = function (value) {
 		'application/json',
 		A2($elm$json$Json$Encode$encode, 0, value));
 };
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (!node.$) {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var $elm$json$Json$Encode$array = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$Array$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(0),
-				entries));
-	});
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(0),
-			pairs));
-};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$typeToString = function (ty) {
-	switch (ty) {
-		case 0:
-			return 'absent';
-		case 1:
-			return 'present';
-		default:
-			return 'placed';
-	}
-};
-var $author$project$Main$letterEncoder = function (letter) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'type',
-				$elm$json$Json$Encode$string(
-					$author$project$Main$typeToString(letter.y))),
-				_Utils_Tuple2(
-				'rune',
-				$elm$json$Json$Encode$string(
-					$elm$core$String$fromChar(letter.D)))
-			]));
-};
-var $author$project$Main$lettersEncoder = function (letters) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'letters',
-				A2($elm$json$Json$Encode$array, $author$project$Main$letterEncoder, letters))
-			]));
-};
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$possibleWordsDecoder = $elm$json$Json$Decode$list($elm$json$Json$Decode$string);
+var $author$project$Service$possibleWordsDecoder = $elm$json$Json$Decode$list($elm$json$Json$Decode$string);
 var $elm$http$Http$Request = function (a) {
 	return {$: 1, a: a};
 };
@@ -6270,23 +6273,20 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{aB: false, R: r.R, W: r.W, Y: r.Y, ab: r.ab, at: r.at, au: r.au, av: r.av}));
 };
-var $author$project$Main$getPossibleWords = function (_v0) {
-	var letters = _v0.k;
-	return $elm$http$Http$request(
-		{
-			R: $elm$http$Http$jsonBody(
-				$author$project$Main$lettersEncoder(letters)),
-			W: A2($elm$http$Http$expectJson, $author$project$Main$GotPatchResponse, $author$project$Main$possibleWordsDecoder),
-			Y: _List_Nil,
-			ab: 'PATCH',
-			at: $elm$core$Maybe$Nothing,
-			au: $elm$core$Maybe$Nothing,
-			av: '/'
-		});
-};
-var $author$project$Main$Restarted = function (a) {
-	return {$: 5, a: a};
-};
+var $author$project$Service$getPossibleWords = F2(
+	function (letters, msg) {
+		return $elm$http$Http$request(
+			{
+				R: $elm$http$Http$jsonBody(
+					$author$project$Letter$array(letters)),
+				W: A2($elm$http$Http$expectJson, msg, $author$project$Service$possibleWordsDecoder),
+				Y: _List_Nil,
+				ab: 'PATCH',
+				at: $elm$core$Maybe$Nothing,
+				au: $elm$core$Maybe$Nothing,
+				av: '/'
+			});
+	});
 var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$expectBytesResponse = F2(
 	function (toMsg, toResult) {
@@ -6305,19 +6305,21 @@ var $elm$http$Http$expectWhatever = function (toMsg) {
 				return $elm$core$Result$Ok(0);
 			}));
 };
-var $author$project$Main$restartTheGame = $elm$http$Http$request(
-	{
-		R: $elm$http$Http$emptyBody,
-		W: $elm$http$Http$expectWhatever($author$project$Main$Restarted),
-		Y: _List_Nil,
-		ab: 'DELETE',
-		at: $elm$core$Maybe$Nothing,
-		au: $elm$core$Maybe$Nothing,
-		av: '/'
-	});
-var $author$project$Main$Placed = 2;
-var $author$project$Main$Present = 1;
-var $author$project$Main$nextType = function (ty) {
+var $author$project$Service$restartTheGame = function (msg) {
+	return $elm$http$Http$request(
+		{
+			R: $elm$http$Http$emptyBody,
+			W: $elm$http$Http$expectWhatever(msg),
+			Y: _List_Nil,
+			ab: 'DELETE',
+			at: $elm$core$Maybe$Nothing,
+			au: $elm$core$Maybe$Nothing,
+			av: '/'
+		});
+};
+var $author$project$Letter$Placed = 2;
+var $author$project$Letter$Present = 1;
+var $author$project$Letter$nextType = function (ty) {
 	switch (ty) {
 		case 0:
 			return 1;
@@ -6327,11 +6329,11 @@ var $author$project$Main$nextType = function (ty) {
 			return 0;
 	}
 };
-var $author$project$Main$altLetter = function (letter) {
+var $author$project$Letter$alt = function (letter) {
 	return _Utils_update(
 		letter,
 		{
-			y: $author$project$Main$nextType(letter.y)
+			I: $author$project$Letter$nextType(letter.I)
 		});
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
@@ -6440,14 +6442,14 @@ var $author$project$Main$updateAltLetter = F2(
 		return _Utils_update(
 			model,
 			{
-				k: A3($elm_community$array_extra$Array$Extra$update, index, $author$project$Main$altLetter, model.k)
+				k: A3($elm_community$array_extra$Array$Extra$update, index, $author$project$Letter$alt, model.k)
 			});
 	});
-var $author$project$Main$replaceRune = F2(
+var $author$project$Letter$map = F2(
 	function (_char, letter) {
 		return _Utils_update(
 			letter,
-			{D: _char});
+			{M: _char});
 	});
 var $author$project$Main$updateLetter = F3(
 	function (index, _char, model) {
@@ -6457,9 +6459,31 @@ var $author$project$Main$updateLetter = F3(
 				k: A3(
 					$elm_community$array_extra$Array$Extra$update,
 					index,
-					$author$project$Main$replaceRune(_char),
+					$author$project$Letter$map(_char),
 					model.k)
 			});
+	});
+var $author$project$Main$updatePossibleWords = F2(
+	function (response, model) {
+		if (!response.$) {
+			var words = response.a;
+			return _Utils_update(
+				model,
+				{
+					A: _Utils_ap(
+						model.A,
+						_List_fromArray(
+							[model.k])),
+					H: words
+				});
+		} else {
+			return _Utils_update(
+				model,
+				{
+					H: _List_fromArray(
+						['FAILURE'])
+				});
+		}
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6483,36 +6507,18 @@ var $author$project$Main$update = F2(
 					A2($author$project$Main$updateAltLetter, index, model),
 					$elm$core$Platform$Cmd$none);
 			case 2:
-				var resp = msg.a;
-				if (!resp.$) {
-					var words = resp.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								B: _Utils_ap(
-									model.B,
-									_List_fromArray(
-										[model.k])),
-								J: words
-							}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								J: _List_fromArray(
-									['FAILURE'])
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
+				var response = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updatePossibleWords, response, model),
+					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					model,
-					$author$project$Main$getPossibleWords(model));
+					A2($author$project$Service$getPossibleWords, model.k, $author$project$Main$GotPossibleWords));
 			case 4:
-				return _Utils_Tuple2(model, $author$project$Main$restartTheGame);
+				return _Utils_Tuple2(
+					model,
+					$author$project$Service$restartTheGame($author$project$Main$Restarted));
 			default:
 				return _Utils_Tuple2($author$project$Main$initModel, $elm$core$Platform$Cmd$none);
 		}
@@ -6670,7 +6676,7 @@ var $elm$core$List$singleton = function (value) {
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewPossibleWords = function (_v0) {
-	var words = _v0.J;
+	var words = _v0.H;
 	return $elm$core$List$singleton(
 		A2(
 			$elm$html$Html$ul,
@@ -6719,10 +6725,10 @@ var $author$project$Main$body = function (model) {
 					[
 						$elm$html$Html$Attributes$type_('text'),
 						$elm$html$Html$Attributes$value(
-						$elm$core$String$fromChar(letter.D)),
+						$elm$core$String$fromChar(letter.M)),
 						$elm$html$Html$Attributes$class('letter'),
 						$elm$html$Html$Attributes$class(
-						$author$project$Main$typeToString(letter.y)),
+						$author$project$Letter$typeToString(letter.I)),
 						$elm$html$Html$Events$onInput(
 						$author$project$Main$GotLetterInput(index)),
 						$elm$html$Html$Events$onDoubleClick(
@@ -6739,12 +6745,12 @@ var $author$project$Main$body = function (model) {
 				[
 					$elm$html$Html$Attributes$class('letter'),
 					$elm$html$Html$Attributes$class(
-					$author$project$Main$typeToString(letter.y))
+					$author$project$Letter$typeToString(letter.I))
 				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text(
-					$elm$core$String$fromChar(letter.D))
+					$elm$core$String$fromChar(letter.M))
 				]));
 	};
 	var historyBoxes = A2(
@@ -6756,7 +6762,7 @@ var $author$project$Main$body = function (model) {
 				$elm$core$Basics$composeR,
 				$elm$core$Array$toList,
 				$elm$html$Html$div(_List_Nil))),
-		model.B);
+		model.A);
 	return _Utils_ap(
 		historyBoxes,
 		_Utils_ap(
