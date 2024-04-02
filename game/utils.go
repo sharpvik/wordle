@@ -5,22 +5,22 @@ import (
 	"strings"
 
 	"github.com/bigmate/set"
+	"github.com/bigmate/slice"
 	"github.com/sharpvik/fungi"
 )
 
 var (
 	//go:embed russian.utf.txt
-	allWords string
-	lines    = strings.Split(allWords, "\n")
+	rawWords string
+	allWords = strings.Split(rawWords, "\n")
+	Words, _ = fungi.CollectSlice(fungi.Batch(length5, onlyLetters)(fungi.SliceStream(allWords)))
 
-	length5 = fungi.Filter(func(s string) bool { return len([]rune(s)) == 5 })
+	russianLetters = set.FromSlice([]rune("йцукенгшщзхъфывапролджэячсмитьбю")...)
+
+	length5 = fungi.Filter(func(s string) bool {
+		return len([]rune(s)) == 5
+	})
+	onlyLetters = fungi.Filter(func(s string) bool {
+		return slice.AllBool(slice.Map([]rune(s), russianLetters.Has)...)
+	})
 )
-
-func runeSet(s string) (alpha set.Set[rune]) {
-	letters := []rune(s)
-	alpha = set.New[rune](len(letters))
-	for _, letter := range letters {
-		alpha.Add(letter)
-	}
-	return
-}

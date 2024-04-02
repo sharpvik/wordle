@@ -5450,13 +5450,10 @@ var $elm$core$String$fromChar = function (_char) {
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Letter$typeToString = function (ty) {
-	switch (ty) {
-		case 0:
-			return 'absent';
-		case 1:
-			return 'present';
-		default:
-			return 'placed';
+	if (!ty) {
+		return 'absent';
+	} else {
+		return 'present';
 	}
 };
 var $author$project$Letter$value = function (letter) {
@@ -6317,16 +6314,12 @@ var $author$project$Service$restartTheGame = function (msg) {
 			av: '/'
 		});
 };
-var $author$project$Letter$Placed = 2;
 var $author$project$Letter$Present = 1;
 var $author$project$Letter$nextType = function (ty) {
-	switch (ty) {
-		case 0:
-			return 1;
-		case 1:
-			return 2;
-		default:
-			return 0;
+	if (!ty) {
+		return 1;
+	} else {
+		return 0;
 	}
 };
 var $author$project$Letter$alt = function (letter) {

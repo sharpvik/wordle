@@ -3,93 +3,43 @@ package game
 import (
 	_ "embed"
 
-	"github.com/bigmate/set"
-	"github.com/bigmate/slice"
 	"github.com/sharpvik/fungi"
 )
 
-const allRussianLetters = "йцукенгшщзхъфывапролджэячсмитьбю"
-
 type Game struct {
-	alphabet set.Set[rune]
-	present  []rune
-	placed   map[int]rune
+	words []string
 }
 
-func New() *Game {
+func New(words []string) *Game {
 	return &Game{
-		alphabet: runeSet(allRussianLetters),
-		placed:   make(map[int]rune),
+		words: words,
 	}
 }
 
 func (g *Game) Update(attempt [5]Letter) *Game {
-	for index, letter := range attempt {
-		switch r := letter.(type) {
-		case PresentLetter:
-			g.addPresent(rune(r))
-		case AbsentLetter:
-			g.removeAbsent(rune(r))
-		case PlacedLetter:
-			g.addPlaced(index, rune(r))
-		}
-	}
+	g.words = update(attempt, g.words)
 	return g
 }
 
-func (g *Game) PossibleWords() []string {
-	ws, _ := fungi.CollectSlice(g.possibleWords())
-	if ws == nil {
-		return []string{}
-	}
-	return ws
+func (g *Game) Words() []string {
+	return g.words
 }
 
-func (g *Game) addPresent(r rune) {
-	g.present = append(g.present, r)
+func update(attempt [5]Letter, words []string) []string {
+	stream := fungi.SliceStream(words)
+	filtered, _ := fungi.CollectSlice(matching(attempt)(stream))
+	return filtered
 }
 
-func (g *Game) removeAbsent(r rune) {
-	g.alphabet.Del(r)
-}
-
-func (g *Game) addPlaced(index int, letter rune) {
-	g.placed[index] = letter
-}
-
-func (g *Game) possibleWords() fungi.Stream[string] {
-	stream := fungi.SliceStream(lines)
-	matching := g.matching()
-	return matching(length5(stream))
-}
-
-func (g *Game) matching() fungi.StreamIdentity[string] {
-	return fungi.Batch(g.byAlpha(), g.byPlaced(), g.byPresent())
-}
-
-func (g *Game) byAlpha() fungi.StreamIdentity[string] {
-	return fungi.Filter(func(s string) bool {
-		return slice.AllBool(slice.Map([]rune(s), g.alphabet.Has)...)
-	})
-}
-
-func (g *Game) byPresent() fungi.StreamIdentity[string] {
-	return fungi.Filter(func(s string) bool {
-		rs := runeSet(s)
-		return slice.AllBool(slice.Map(g.present, func(r rune) bool {
-			return rs.Has(r)
-		})...)
-	})
-}
-
-func (g *Game) byPlaced() fungi.StreamIdentity[string] {
-	return fungi.Filter(func(s string) bool {
-		rs := []rune(s)
-		for index, expect := range g.placed {
-			if rs[index] != expect {
-				return false
-			}
+func matching(attempt [5]Letter) fungi.StreamIdentity[string] {
+	var filters []fungi.StreamIdentity[string]
+	for index, letter := range attempt {
+		switch r := letter.(type) {
+		case PresentLetter:
+			filters = append(filters, atPosition(index, rune(r)))
+		case AbsentLetter:
+			filters = append(filters, notAtPosition(index, rune(r)))
 		}
-		return true
-	})
+	}
+	return fungi.Batch(filters...)
 }

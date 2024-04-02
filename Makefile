@@ -4,6 +4,5 @@ dev:
 prod:
 	elm make --optimize --output ./app/js/main.js ./src/Main.elm
 
-install:
-	make prod
+install: prod
 	go install

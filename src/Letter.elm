@@ -55,7 +55,6 @@ value letter =
 type Type
     = Absent
     | Present
-    | Placed
 
 
 typeToString : Type -> String
@@ -67,9 +66,6 @@ typeToString ty =
         Present ->
             "present"
 
-        Placed ->
-            "placed"
-
 
 nextType : Type -> Type
 nextType ty =
@@ -78,7 +74,4 @@ nextType ty =
             Present
 
         Present ->
-            Placed
-
-        Placed ->
             Absent

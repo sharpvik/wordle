@@ -16,7 +16,7 @@ type Service struct {
 
 func New() *Service {
 	return &Service{
-		Game: game.New(),
+		Game: game.New(game.Words),
 	}
 }
 
@@ -29,7 +29,7 @@ func (s *Service) Server(app fs.FS) *echo.Echo {
 }
 
 func (s *Service) restart(c echo.Context) error {
-	s.Game = game.New()
+	s.Game = game.New(game.Words)
 	log.Println("GAME RESET")
 	c.String(http.StatusOK, "GAME RESET")
 	return nil
@@ -49,7 +49,7 @@ func (s *Service) update(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "NOT ENOUGH LETTERS")
 	}
 
-	words := s.Update([5]game.Letter(letters)).PossibleWords()
+	words := s.Update([5]game.Letter(letters)).Words()
 	return c.JSONPretty(http.StatusOK, words, "  ")
 }
 
@@ -65,7 +65,7 @@ type RequestLetter struct {
 func makeLetter(letter *RequestLetter) game.Letter {
 	switch r := []rune(letter.Rune)[0]; letter.Type {
 	case "placed":
-		return game.PlacedLetter(r)
+		return game.PresentLetter(r)
 	case "present":
 		return game.PresentLetter(r)
 	default:

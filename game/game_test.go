@@ -7,7 +7,7 @@ import (
 )
 
 func TestGame(t *testing.T) {
-	g := New()
+	g := New(Words)
 
 	g.Update([5]Letter{
 		PresentLetter('б'),
@@ -16,23 +16,23 @@ func TestGame(t *testing.T) {
 		AbsentLetter('в'),
 		PresentLetter('а'),
 	})
-	assert.NotEmpty(t, g.PossibleWords())
+	assert.NotEmpty(t, g.Words())
 
 	g.Update([5]Letter{
 		AbsentLetter('т'),
-		PlacedLetter('а'),
-		PlacedLetter('б'),
+		PresentLetter('а'),
+		PresentLetter('б'),
 		AbsentLetter('л'),
 		AbsentLetter('о'),
 	})
-	assert.NotEmpty(t, g.PossibleWords())
+	assert.NotEmpty(t, g.Words())
 
 	g.Update([5]Letter{
 		AbsentLetter('ш'),
-		PlacedLetter('а'),
-		PlacedLetter('б'),
+		PresentLetter('а'),
+		PresentLetter('б'),
 		AbsentLetter('а'),
 		AbsentLetter('ш'),
 	})
-	assert.NotEmpty(t, g.PossibleWords())
+	assert.NotEmpty(t, g.Words())
 }
