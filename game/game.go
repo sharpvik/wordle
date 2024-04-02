@@ -39,6 +39,9 @@ func (g *Game) Update(attempt [5]Letter) *Game {
 
 func (g *Game) PossibleWords() []string {
 	ws, _ := fungi.CollectSlice(g.possibleWords())
+	if ws == nil {
+		return []string{}
+	}
 	return ws
 }
 

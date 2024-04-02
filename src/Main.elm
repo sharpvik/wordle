@@ -165,8 +165,20 @@ updatePossibleWords response model =
                 , history = model.history ++ [ model.letters ]
             }
 
-        _ ->
-            { model | words = [ "FAILURE" ] }
+        Err (Http.BadStatus code) ->
+            { model
+                | words = [ "FAILURE STATUS CODE: " ++ String.fromInt code ]
+            }
+
+        Err (Http.BadBody reason) ->
+            { model
+                | words = [ "FAILURE TO READ BODY: " ++ reason ]
+            }
+
+        Err _ ->
+            { model
+                | words = [ "FAILURE" ]
+            }
 
 
 

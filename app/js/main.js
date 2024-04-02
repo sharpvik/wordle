@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.O.B === region.U.B)
+	if (region.O.C === region.U.C)
 	{
-		return 'on line ' + region.O.B;
+		return 'on line ' + region.O.C;
 	}
-	return 'on lines ' + region.O.B + ' through ' + region.U.B;
+	return 'on lines ' + region.O.C + ' through ' + region.U.C;
 }
 
 
@@ -5387,7 +5387,7 @@ var $author$project$Letter$row = A2(
 	$elm$core$Array$repeat,
 	5,
 	A2($author$project$Letter$Letter, 'з', 0));
-var $author$project$Main$initModel = {A: _List_Nil, k: $author$project$Letter$row, H: _List_Nil};
+var $author$project$Main$initModel = {B: _List_Nil, k: $author$project$Letter$row, v: _List_Nil};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
@@ -6470,19 +6470,40 @@ var $author$project$Main$updatePossibleWords = F2(
 			return _Utils_update(
 				model,
 				{
-					A: _Utils_ap(
-						model.A,
+					B: _Utils_ap(
+						model.B,
 						_List_fromArray(
 							[model.k])),
-					H: words
+					v: words
 				});
 		} else {
-			return _Utils_update(
-				model,
-				{
-					H: _List_fromArray(
-						['FAILURE'])
-				});
+			switch (response.a.$) {
+				case 3:
+					var code = response.a.a;
+					return _Utils_update(
+						model,
+						{
+							v: _List_fromArray(
+								[
+									'FAILURE STATUS CODE: ' + $elm$core$String$fromInt(code)
+								])
+						});
+				case 4:
+					var reason = response.a.a;
+					return _Utils_update(
+						model,
+						{
+							v: _List_fromArray(
+								['FAILURE TO READ BODY: ' + reason])
+						});
+				default:
+					return _Utils_update(
+						model,
+						{
+							v: _List_fromArray(
+								['FAILURE'])
+						});
+			}
 		}
 	});
 var $author$project$Main$update = F2(
@@ -6676,7 +6697,7 @@ var $elm$core$List$singleton = function (value) {
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewPossibleWords = function (_v0) {
-	var words = _v0.H;
+	var words = _v0.v;
 	return $elm$core$List$singleton(
 		A2(
 			$elm$html$Html$ul,
@@ -6762,7 +6783,7 @@ var $author$project$Main$body = function (model) {
 				$elm$core$Basics$composeR,
 				$elm$core$Array$toList,
 				$elm$html$Html$div(_List_Nil))),
-		model.A);
+		model.B);
 	return _Utils_ap(
 		historyBoxes,
 		_Utils_ap(
