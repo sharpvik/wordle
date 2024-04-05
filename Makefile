@@ -4,5 +4,9 @@ dev:
 prod:
 	elm make --optimize --output ./app/js/main.js ./src/Main.elm
 
+run: dev
+	go install
+	wordle
+
 install: prod
 	go install

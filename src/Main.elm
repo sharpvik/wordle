@@ -3,12 +3,15 @@ module Main exposing (..)
 import Array exposing (Array)
 import Array.Extra as Arr
 import Browser
-import Html exposing (Html, button, div, input, li, span, text, ul)
-import Html.Attributes exposing (class, type_, value)
+import Browser.Dom exposing (focus)
+import Html exposing (Html, button, div, li, text, ul)
+import Html.Attributes exposing (id, style)
 import Html.Events exposing (onClick, onDoubleClick, onInput)
 import Http
-import Letter exposing (Letter, Type(..))
+import Letter exposing (Letter, Type(..), isRussian)
 import Service
+import Task
+import Ui exposing (container)
 
 
 
@@ -19,11 +22,13 @@ type alias Model =
     { letters : Array Letter
     , words : List String
     , history : List (Array Letter)
+    , focused : Int
     }
 
 
 type Msg
-    = GotLetterInput Int String
+    = Ignore
+    | GotLetterInput String
     | GotLetterAlt Int
     | GotPossibleWords (Result Http.Error (List String))
     | Submit
@@ -37,7 +42,7 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initModel, Cmd.none )
+    ( initModel, useBox 0 )
 
 
 initModel : Model
@@ -45,6 +50,7 @@ initModel =
     { letters = Letter.row
     , words = []
     , history = []
+    , focused = 0
     }
 
 
@@ -60,59 +66,82 @@ view =
 body : Model -> List (Html Msg)
 body model =
     let
-        letterInputBoxes =
-            Array.indexedMap letterInputBox model.letters |> Array.toList
-
-        letterInputBox index letter =
-            input
-                [ type_ "text"
-                , value <| String.fromChar letter.rune
-                , class <| "letter"
-                , class <| Letter.typeToString letter.ty
-                , onInput <| GotLetterInput index
-                , onDoubleClick <| GotLetterAlt index
-                ]
-                []
-
-        restartButton =
-            button
-                [ class "restart"
-                , onClick <| Restart
-                ]
-                [ text "Restart" ]
-
-        submitButton =
-            button
-                [ class "submit"
-                , onClick <| Submit
-                ]
-                [ text "Submit" ]
-
         historyBoxes =
             List.map
-                (Array.map historyBox
+                (Array.map Letter.inactive
                     >> Array.toList
                     >> div []
                 )
                 model.history
 
-        historyBox letter =
-            span
-                [ class <| "letter"
-                , class <| Letter.typeToString letter.ty
+        inputBoxes =
+            Array.indexedMap box model.letters |> Array.toList
+
+        box index =
+            Letter.box <|
+                [ onInput <| GotLetterInput
+                , onDoubleClick <| GotLetterAlt index
+                , id <| boxId index
                 ]
-                [ text <| String.fromChar letter.rune ]
+                    ++ (if index == model.focused then
+                            [ style "border" "4px solid #fedd30" ]
+
+                        else
+                            []
+                       )
+
+        restartButton =
+            button
+                [ onClick Restart
+                , style "background-color" "red"
+                , style "border" "4px solid red"
+                , style "border-radius" "8px"
+                , style "display" "inline-block"
+                , style "font-size" "1.5rem"
+                , style "margin" "8px"
+                , style "padding" "4px 8px"
+                , style "text-align" "center"
+                , style "cursor" "pointer"
+                ]
+                [ text "Restart" ]
+
+        submitButton =
+            button
+                [ onClick Submit
+                , style "background-color" "darkorange"
+                , style "border" "4px solid darkorange"
+                , style "border-radius" "8px"
+                , style "display" "inline-block"
+                , style "font-size" "1.5rem"
+                , style "margin" "8px"
+                , style "padding" "4px 8px"
+                , style "text-align" "center"
+                , style "cursor" "pointer"
+                ]
+                [ text "Submit" ]
     in
     historyBoxes
-        ++ letterInputBoxes
+        ++ inputBoxes
         ++ submitButton
         :: restartButton
         :: viewPossibleWords model
+        |> container []
+        |> List.singleton
 
 
 viewPossibleWords : Model -> List (Html Msg)
 viewPossibleWords { words } =
-    List.map (\word -> li [] [ text word ]) words |> ul [] |> List.singleton
+    let
+        item word =
+            li
+                [ style "display" "inline-block"
+                , style "padding" "8px"
+                , style "margin" "8px"
+                , style "background-color" "white"
+                ]
+                [ text word ]
+    in
+    List.map item words |> ul [] |> List.singleton
 
 
 
@@ -122,13 +151,33 @@ viewPossibleWords { words } =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotLetterInput index contents ->
-            case String.uncons contents of
+        Ignore ->
+            ( model, Cmd.none )
+
+        GotLetterInput contents ->
+            case String.uncons <| String.reverse contents of
                 Just ( char, _ ) ->
-                    ( updateLetter index char model, Cmd.none )
+                    if isRussian char then
+                        ( updateLetter char model, Cmd.none )
+
+                    else if char == ' ' then
+                        ( updateAltLetter model.focused model, Cmd.none )
+
+                    else if Char.isDigit char then
+                        ( char
+                            |> String.fromChar
+                            |> String.toInt
+                            |> Maybe.withDefault 0
+                            |> (\n -> n - 1)
+                            |> setFocus model
+                        , Cmd.none
+                        )
+
+                    else
+                        ( model, Cmd.none )
 
                 Nothing ->
-                    ( model, Cmd.none )
+                    ( shiftFocus -1 model, Cmd.none )
 
         GotLetterAlt index ->
             ( updateAltLetter index model, Cmd.none )
@@ -146,9 +195,20 @@ update msg model =
             ( initModel, Cmd.none )
 
 
-updateLetter : Int -> Char -> Model -> Model
-updateLetter index char model =
-    { model | letters = Arr.update index (Letter.map char) model.letters }
+updateLetter : Char -> Model -> Model
+updateLetter char model =
+    { model | letters = Arr.update model.focused (Letter.map char) model.letters }
+        |> shiftFocus 1
+
+
+shiftFocus : Int -> Model -> Model
+shiftFocus shift model =
+    setFocus model <| model.focused + shift
+
+
+setFocus : Model -> Int -> Model
+setFocus model id =
+    { model | focused = modBy 5 id }
 
 
 updateAltLetter : Int -> Model -> Model
@@ -179,6 +239,20 @@ updatePossibleWords response model =
             { model
                 | words = [ "FAILURE" ]
             }
+
+
+
+-- CMD
+
+
+useBox : Int -> Cmd Msg
+useBox =
+    Task.attempt (\_ -> Ignore) << focus << boxId
+
+
+boxId : Int -> String
+boxId =
+    String.fromInt >> (++) "box"
 
 
 
