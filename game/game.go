@@ -3,43 +3,96 @@ package game
 import (
 	_ "embed"
 
+	"github.com/bigmate/set"
 	"github.com/sharpvik/fungi"
 )
 
 type Game struct {
-	words []string
+	words     []string
+	positions [5]set.Set[rune]
+	has       map[rune]int
 }
 
 func New(words []string) *Game {
 	return &Game{
 		words: words,
+		positions: [5]set.Set[rune]{
+			letterSet(),
+			letterSet(),
+			letterSet(),
+			letterSet(),
+			letterSet(),
+		},
+		has: make(map[rune]int),
 	}
 }
 
 func (g *Game) Update(attempt [5]Letter) *Game {
-	g.words = update(attempt, g.words)
-	return g
+	return g.update(attempt).filter()
 }
 
 func (g *Game) Words() []string {
 	return g.words
 }
 
-func update(attempt [5]Letter, words []string) []string {
-	stream := fungi.SliceStream(words)
-	filtered, _ := fungi.CollectSlice(matching(attempt)(stream))
-	return filtered
+func (g *Game) filter() *Game {
+	stream := fungi.SliceStream(g.words)
+	filters := fungi.Batch(g.filterAtPosition(), g.filterMustHave())
+	g.words, _ = fungi.CollectSlice(filters(stream))
+	return g
 }
 
-func matching(attempt [5]Letter) fungi.StreamIdentity[string] {
-	var filters []fungi.StreamIdentity[string]
-	for index, letter := range attempt {
-		switch r := letter.(type) {
+func (g *Game) update(attempt [5]Letter) *Game {
+	has := make(map[rune]int)
+	for i, letter := range attempt {
+		switch l := letter.(type) {
+		case ExactLetter:
+			has[rune(l)]++
+			g.atPosition(i, rune(l))
 		case PresentLetter:
-			filters = append(filters, atPosition(index, rune(r)))
+			has[rune(l)]++
+			g.notAtPosition(i, rune(l))
 		case AbsentLetter:
-			filters = append(filters, notAtPosition(index, rune(r)))
+			r := rune(l)
+			_, ok1 := has[r]
+			_, ok2 := g.has[r]
+			if ok1 || ok2 {
+				g.notAtPosition(i, r)
+			} else {
+				g.notInWord(r)
+			}
 		}
+	}
+	layer(g.has, has)
+	return g
+}
+
+func (g *Game) atPosition(i int, r rune) {
+	g.positions[i] = set.FromSlice(r)
+}
+
+func (g *Game) notInWord(r rune) {
+	for _, position := range g.positions {
+		position.Del(r)
+	}
+}
+
+func (g *Game) notAtPosition(i int, r rune) {
+	g.positions[i].Del(r)
+}
+
+func (g *Game) filterMustHave() fungi.StreamIdentity[string] {
+	var filters []fungi.StreamIdentity[string]
+	for letter, count := range g.has {
+		filters = append(filters, present(letter, count))
+	}
+	return fungi.Batch(filters...)
+}
+
+func (g *Game) filterAtPosition() fungi.StreamIdentity[string] {
+	var filters []fungi.StreamIdentity[string]
+	for i, s := range g.positions {
+		filters = append(filters, atPosition(i, s))
 	}
 	return fungi.Batch(filters...)
 }

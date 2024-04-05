@@ -64,8 +64,8 @@ type RequestLetter struct {
 
 func makeLetter(letter *RequestLetter) game.Letter {
 	switch r := []rune(letter.Rune)[0]; letter.Type {
-	case "placed":
-		return game.PresentLetter(r)
+	case "exact":
+		return game.ExactLetter(r)
 	case "present":
 		return game.PresentLetter(r)
 	default:

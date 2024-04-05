@@ -55,6 +55,7 @@ value letter =
 type Type
     = Absent
     | Present
+    | Exact
 
 
 typeToString : Type -> String
@@ -66,6 +67,9 @@ typeToString ty =
         Present ->
             "present"
 
+        Exact ->
+            "exact"
+
 
 nextType : Type -> Type
 nextType ty =
@@ -74,4 +78,7 @@ nextType ty =
             Present
 
         Present ->
+            Exact
+
+        Exact ->
             Absent

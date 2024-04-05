@@ -23,6 +23,11 @@ body {
   color: black;
 }
 .present {
+  background-color: white;
+  color: black;
+  border: 2px solid grey;
+}
+.exact {
   background-color: yellow;
   color: black;
   border: 2px solid darkorange;
