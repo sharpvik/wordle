@@ -6755,6 +6755,30 @@ var $author$project$Letter$box = F2(
 			_List_Nil);
 	});
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Ui$button_ = F2(
+	function (attrs, messsage) {
+		var myattrs = _List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+				A2($elm$html$Html$Attributes$style, 'border', '4px transparent'),
+				A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
+				A2($elm$html$Html$Attributes$style, 'font-size', '1.5rem'),
+				A2($elm$html$Html$Attributes$style, 'margin', '8px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
+				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+				A2($elm$html$Html$Attributes$style, 'color', 'black')
+			]);
+		return A2(
+			$elm$html$Html$button,
+			_Utils_ap(myattrs, attrs),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(messsage)
+				]));
+	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Ui$container = F2(
 	function (attrs, tags) {
@@ -6771,8 +6795,6 @@ var $author$project$Ui$container = F2(
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Letter$inactive = function (_v0) {
 	var rune = _v0.F;
 	var ty = _v0.A;
@@ -6935,43 +6957,21 @@ var $author$project$Main$viewPossibleWords = function (_v0) {
 };
 var $author$project$Main$body = function (model) {
 	var submitButton = A2(
-		$elm$html$Html$button,
+		$author$project$Ui$button_,
 		_List_fromArray(
 			[
 				$elm$html$Html$Events$onClick($author$project$Main$Submit),
-				A2($elm$html$Html$Attributes$style, 'background-color', 'darkorange'),
-				A2($elm$html$Html$Attributes$style, 'border', '4px solid darkorange'),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-				A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
-				A2($elm$html$Html$Attributes$style, 'font-size', '1.5rem'),
-				A2($elm$html$Html$Attributes$style, 'margin', '8px'),
-				A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+				A2($elm$html$Html$Attributes$style, 'background-color', 'darkorange')
 			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Submit')
-			]));
+		'Submit');
 	var restartButton = A2(
-		$elm$html$Html$button,
+		$author$project$Ui$button_,
 		_List_fromArray(
 			[
 				$elm$html$Html$Events$onClick($author$project$Main$Restart),
-				A2($elm$html$Html$Attributes$style, 'background-color', 'red'),
-				A2($elm$html$Html$Attributes$style, 'border', '4px solid red'),
-				A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-				A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
-				A2($elm$html$Html$Attributes$style, 'font-size', '1.5rem'),
-				A2($elm$html$Html$Attributes$style, 'margin', '8px'),
-				A2($elm$html$Html$Attributes$style, 'padding', '4px 8px'),
-				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+				A2($elm$html$Html$Attributes$style, 'background-color', 'red')
 			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Restart')
-			]));
+		'Restart');
 	var historyBoxes = A2(
 		$elm$core$List$map,
 		A2(

@@ -11,7 +11,7 @@ import Http
 import Letter exposing (Letter, Type(..), isRussian)
 import Service
 import Task
-import Ui exposing (container)
+import Ui exposing (button_, container)
 
 
 
@@ -91,34 +91,18 @@ body model =
                        )
 
         restartButton =
-            button
+            button_
                 [ onClick Restart
                 , style "background-color" "red"
-                , style "border" "4px solid red"
-                , style "border-radius" "8px"
-                , style "display" "inline-block"
-                , style "font-size" "1.5rem"
-                , style "margin" "8px"
-                , style "padding" "4px 8px"
-                , style "text-align" "center"
-                , style "cursor" "pointer"
                 ]
-                [ text "Restart" ]
+                "Restart"
 
         submitButton =
-            button
+            button_
                 [ onClick Submit
                 , style "background-color" "darkorange"
-                , style "border" "4px solid darkorange"
-                , style "border-radius" "8px"
-                , style "display" "inline-block"
-                , style "font-size" "1.5rem"
-                , style "margin" "8px"
-                , style "padding" "4px 8px"
-                , style "text-align" "center"
-                , style "cursor" "pointer"
                 ]
-                [ text "Submit" ]
+                "Submit"
     in
     historyBoxes
         ++ inputBoxes
