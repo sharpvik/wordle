@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Array.Extra as Arr
 import Browser
 import Browser.Dom exposing (focus)
-import Html exposing (Html, button, div, li, text, ul)
+import Html exposing (Html, div, li, text, ul)
 import Html.Attributes exposing (id, style)
 import Html.Events exposing (onClick, onDoubleClick, onInput)
 import Http
