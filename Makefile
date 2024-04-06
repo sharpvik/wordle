@@ -10,3 +10,6 @@ run: dev
 
 install: prod
 	go install
+
+win: prod
+	GOOS=windows GOARCH=amd64 go build
